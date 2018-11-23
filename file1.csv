@@ -1,0 +1,16 @@
+"","GroupName","Groupcode","GroupOwner","GroupCategoryID"
+"1","System Administrators","sysadmin",13456,100
+"2","Independence High Teachers","HS Teachers",1234,101
+"3","John Glenn Middle Teachers","MS Teachers",13458,102
+"4","Liberty Elementary Teachers","Elem Teachers",13559,103
+"5","1st Grade Teachers","1stgrade",NA,104
+"6","2nd Grade Teachers","2nsgrade",13561,105
+"7","3rd Grade Teachers","3rdgrade",13562,106
+"8","Guidance Department","guidance",NA,107
+"9","Independence Math Teachers","HS Math",13660,108
+"10","Independence English Teachers","HS English",13661,109
+"11","John Glenn 8th Grade Teachers","8thgrade",NA,110
+"12","John Glenn 7th Grade Teachers","7thgrade",13452,111
+"13","Elementary Parents","Elem Parents",NA,112
+"14","Middle School Parents","MS Parents",18001,113
+"15","High School Parents","HS Parents",18002,114
