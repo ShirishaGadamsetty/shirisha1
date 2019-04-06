@@ -1,0 +1,185 @@
+---
+title: "HEARTprjt"
+author: "shirisha"
+date: "February 15, 2019"
+output: html_document
+---
+
+```{r}
+ #checking current directory
+getwd()
+#importing the file into R environment
+heartDS <- read.csv(file = "E:/DataScience/heart.csv", header = T) #na.strings = c(":", "?")
+
+```
+```{r}
+#checking no of rows and columns
+dim(heartDS)
+```
+```{r}
+#structure of the data
+str(heartDS)
+```
+```{r}
+#summary of dataset
+summary(heartDS)
+```
+```{r}
+#checking for missing values
+colSums(is.na(heartDS))
+```
+```{r}
+#converting the columns datatypes 
+heartDS$sex = as.factor(heartDS$sex)
+heartDS$cp = as.factor(heartDS$cp)
+heartDS$fbs = as.factor(heartDS$fbs)
+heartDS$restecg = as.factor(heartDS$restecg)
+heartDS$exang = as.factor(heartDS$exang)
+heartDS$slope = as.factor(heartDS$slope)
+heartDS$ca = as.factor(heartDS$ca)
+heartDS$thal = as.factor(heartDS$thal)
+heartDS$target = as.factor(heartDS$target)
+```
+```{r}
+#strucure of dataset
+str(heartDS)
+summary(heartDS)
+```
+```{r}
+#column names 
+names(heartDS)
+```
+```{r}
+#checking for corelation and delete highly corelated columns
+# taking all numerical columns in one variable
+numds = heartDS[c("age","trestbps","chol","thalach","oldpeak")]
+numds
+num_cor <- cor(numds)
+num_cor
+library(caret)
+high_cor_features = findCorrelation(x=num_cor, cutoff = 0.80, verbose = F, exact = T, names = T)
+high_cor_features #chol col is highely corelated with 0.95 
+```
+```{r}
+# removing the highly corelated col
+numds <- numds[-c(3)]
+numds
+```
+```{r}
+# finding outliers in numerical columns
+boxplot(numds)
+```
+```{r}
+#finding what are the outliers // univarient analysis
+summary(numds$trestbps)
+View(numds$trestbps)
+outlier_values <- boxplot.stats(numds$trestbps)$out
+outlier_values #172 178 180 180 200 174 192 178 180
+
+summary(numds$thalach)
+View(numds$thalach)
+outlier_values <- boxplot.stats(numds$thalach)$out
+outlier_values #71
+
+summary(numds$oldpeak)
+View(numds$oldpeak)
+outlier_values <- boxplot.stats(numds$oldpeak)$out
+outlier_values #4.2 6.2 5.6 4.2 4.4
+boxplot(numds$oldpeak)
+
+```
+```{r}
+# removing the outliers using percentaile capping
+x <- numds$trestbps
+qnt <- quantile(x, probs=c(.25, .75), na.rm = T)
+qnt
+caps <- quantile(x, probs=c(.05, .95), na.rm = T)
+caps
+H <- 1.5 * IQR(x, na.rm = T)
+H
+x[x < (qnt[1] - H)] <- caps[1]
+x
+x[x > (qnt[2] + H)] <- caps[2]
+numds$trestbps <- x
+boxplot(numds$trestbps)
+
+x <- numds$thalach
+qnt <- quantile(x, probs=c(.25, .75), na.rm = T)
+qnt
+caps <- quantile(x, probs=c(.05, .95), na.rm = T)
+caps
+H <- 1.5 * IQR(x, na.rm = T)
+H
+x[x < (qnt[1] - H)] <- caps[1]
+x
+x[x > (qnt[2] + H)] <- caps[2]
+numds$thalach <- x
+boxplot(numds$thalach)
+
+
+x <- numds$oldpeak
+qnt <- quantile(x, probs=c(.25, .75), na.rm = T)
+qnt
+caps <- quantile(x, probs=c(.05, .95), na.rm = T)
+caps
+H <- 1.5 * IQR(x, na.rm = T)
+H
+x[x < (qnt[1] - H)] <- caps[1]
+x
+x[x > (qnt[2] + H)] <- caps[2]
+numds$oldpeak <- x
+boxplot(numds$oldpeak)
+
+boxplot(numds)
+```
+```{r}
+#combining the numerical and catagorical columns after eda
+heart_cat <- heartDS[c(2,3,6,7,9,11,12,13,14)]
+names(heart_cat)
+names(numds)
+```
+```{r}
+heartTol <- data.frame(heart_cat,numds)
+names(heartTol)
+```
+```{r}
+# split the total dataset into 70:30 ratio
+set.seed(143)
+train_rows = createDataPartition(y = heartTol$target, p = 0.8, list = F)
+train = heartTol[train_rows, ]
+val = heartTol[-train_rows, ]
+rm(train_rows)
+
+dim(train)
+dim(val)
+
+```
+```{r}
+#check for class imbalance 
+table(train$target) #0(111) , 1(132)
+#methods for imbalacing data 1. collect the more data
+#2. confusionMatrix , check ROC Curves
+#3.resampling
+#checking which colums are required
+```
+```{r}
+#checking which colums are required
+aov.out = aov(age ~., data=train)
+summary(aov.out)
+```
+```{r}
+#apply logistic regression
+fit <- glm(target ~.,data=train,family="binomial")
+summary(fit)
+```
+```{r}
+#model apply on validation dataset
+pred=predict(fit,val)
+p1=ifelse(pred>0.5,1,0)
+```
+```{r}
+#check the accuracy
+table(p1,val$target)
+#81.6666
+
+```

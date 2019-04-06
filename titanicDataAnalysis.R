@@ -23,7 +23,7 @@ table(data.combined$survived)
 # Distribution across classes
 table(data.combined$pclass)
 
-install.packages("")
+install.packages("ggplot2")
 # Load up ggplot2 package to use for visualizations
 library(ggplot2)
 
@@ -93,7 +93,7 @@ for (i in 1:nrow(data.combined)) {
   titles <- c(titles, extractTitle(data.combined[i,"name"]))
 }
 data.combined$title <- as.factor(titles)
-
+data.combined$title
 # Since we only have survived lables for the train set, only use the
 # first 891 rows
 ggplot(data.combined[1:891,], aes(x = title, fill = survived)) +
@@ -166,7 +166,7 @@ length(unique(data.combined$sibsp))
 data.combined$sibsp <- as.factor(data.combined$sibsp)
 
 
-# We believe title is predictive. Visualize survival reates by sibsp, pclass, and title
+# We believe title is predictive. Visualize survival rates by sibsp, pclass, and title
 ggplot(data.combined[1:891,], aes(x = sibsp, fill = survived)) +
   geom_bar() +
   facet_wrap(~pclass + title) + 
@@ -193,7 +193,7 @@ ggplot(data.combined[1:891,], aes(x = parch, fill = survived)) +
 temp.sibsp <- c(train$sibsp, test$sibsp)
 temp.parch <- c(train$parch, test$parch)
 data.combined$family.size <- as.factor(temp.sibsp + temp.parch + 1)
-
+View(data.combined$family.size)
 
 # Visualize it to see if it is predictive
 ggplot(data.combined[1:891,], aes(x = family.size, fill = survived)) +
